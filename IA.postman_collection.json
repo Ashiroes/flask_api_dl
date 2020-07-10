@@ -6,14 +6,14 @@
 	},
 	"item": [
 		{
-			"name": "Generate model",
+			"name": "Generate song",
 			"request": {
 				"method": "POST",
 				"header": [
 					{
 						"key": "Content",
-						"value": "application/json",
-						"type": "text"
+						"type": "text",
+						"value": "application/json"
 					}
 				],
 				"body": {
@@ -26,7 +26,7 @@
 					}
 				},
 				"url": {
-					"raw": "127.0.0.1:5000/api/v1/generate_model",
+					"raw": "127.0.0.1:5000/api/v1/generate_song",
 					"host": [
 						"127",
 						"0",
@@ -37,21 +37,22 @@
 					"path": [
 						"api",
 						"v1",
-						"generate_model"
+						"generate_song"
 					]
 				}
 			},
 			"response": []
 		},
 		{
-			"name": "Generate song",
+			"name": "Generate image",
 			"request": {
 				"method": "POST",
 				"header": [
 					{
 						"key": "content-type",
 						"value": "multipart/form-data",
-						"type": "text"
+						"type": "text",
+						"disabled": true
 					}
 				],
 				"body": {
@@ -70,7 +71,7 @@
 					]
 				},
 				"url": {
-					"raw": "127.0.0.1:5000/api/v1/generate_song",
+					"raw": "127.0.0.1:5000/api/v1/generate_image",
 					"host": [
 						"127",
 						"0",
@@ -81,7 +82,53 @@
 					"path": [
 						"api",
 						"v1",
-						"generate_song"
+						"generate_image"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get all instruments",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "127.0.0.1:5000/api/v1/instruments",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "5000",
+					"path": [
+						"api",
+						"v1",
+						"instruments"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get all categories",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "127.0.0.1:5000/api/v1/categories",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "5000",
+					"path": [
+						"api",
+						"v1",
+						"categories"
 					]
 				}
 			},

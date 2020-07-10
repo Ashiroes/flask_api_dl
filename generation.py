@@ -12,7 +12,7 @@ from keras.models import Sequential
 from keras.layers import Dense
 from keras.layers import Dropout
 from keras.layers import LSTM
-from keras.layers import CuDNNLSTM, BatchNormalization, Bidirectional
+from keras.layers import BatchNormalization, Bidirectional
 from keras.layers import Activation
 from keras.layers import BatchNormalization as BatchNorm
 from keras.utils import np_utils
@@ -53,11 +53,11 @@ def preparationSequences(notes, pitchnames, n_vocab):
 
 def creationDuReseau(network_input, n_vocab, model_name):
     model = Sequential()
-    model.add(CuDNNLSTM(512,input_shape=(network_input.shape[1], network_input.shape[2]),return_sequences=True))
+    model.add(LSTM(512,input_shape=(network_input.shape[1], network_input.shape[2]),return_sequences=True))
     model.add(Dropout(0.3))
-    model.add(Bidirectional(CuDNNLSTM(256, return_sequences=True)))
+    model.add(Bidirectional(LSTM(256, return_sequences=True)))
     model.add(Dropout(0.3))
-    model.add(Bidirectional(CuDNNLSTM(256)))
+    model.add(Bidirectional(LSTM(256)))
     model.add(Dense(256))
     model.add(Activation('relu'))
     model.add(BatchNorm())
@@ -109,7 +109,7 @@ def generate_notes(modele, entree_reseau, pitchnames, n_vocab):
     return prediction_output
 
 
-def sauvegardeMidiFile(prediction_output):
+def sauvegardeMidiFile(prediction_output, instru):
     offset = 0
     output_notes = []
 
@@ -121,7 +121,7 @@ def sauvegardeMidiFile(prediction_output):
             notes = []
             for current_note in notes_in_chord:
                 new_note = note.Note(int(current_note))
-                new_note.storedInstrument = instrument.AcousticGuitar()
+                new_note.storedInstrument = instru
                 notes.append(new_note)
             new_chord = chord.Chord(notes)
             new_chord.offset = offset
@@ -131,7 +131,7 @@ def sauvegardeMidiFile(prediction_output):
         else:
             new_note = note.Note(pattern)
             new_note.offset = offset
-            new_note.storedInstrument = instrument.AcousticGuitar()
+            new_note.storedInstrument = instru
             output_notes.append(new_note)
 
         # Augmentation de l'offset afin que les notes ne s'empilent pas
@@ -143,7 +143,7 @@ def sauvegardeMidiFile(prediction_output):
 
     s = converter.parse(name)
     for p in s.parts:
-        p.insert(0, instrument.AcousticGuitar())
+        p.insert(0, instru)
     midi_stream = stream.Stream(s)
     midi_stream.write('midi', fp=name)
 
@@ -153,7 +153,7 @@ def sauvegardeMidiFile(prediction_output):
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 #    APPLICATION
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-def generate_song(name: str, model_name: str) -> str:
+def generate_song(name: str, model_name: str, instru=instrument.AcousticGuitar()) -> str:
     with open('dataset/' + name + '/notes.txt', 'rb') as fichier:
         notes = pickle.load(fichier)
 
@@ -167,4 +167,4 @@ def generate_song(name: str, model_name: str) -> str:
     prediction = generate_notes(modele, entree_reseau, frequencesNotes, n_vocab)
 
     K.clear_session()
-    return sauvegardeMidiFile(prediction)
+    return sauvegardeMidiFile(prediction, instru)

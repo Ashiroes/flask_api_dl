@@ -2,6 +2,7 @@ import os
 from os.path import dirname, realpath, join
 
 from flask import Flask, request, jsonify, send_file
+from music21 import instrument
 from werkzeug.utils import secure_filename
 
 from generation import generate_song
@@ -15,7 +16,7 @@ ALLOWED_EXTENSIONS = set(['jpg'])
 basedir = os.path.abspath(os.path.dirname(__file__))
 
 categories_with_models = {'Rock': 'test', '80s': 'modeles/80s.hdf5'}
-
+instruments = {'Guitare': instrument.AcousticGuitar(), 'Piano': instrument.Piano(), 'Violon': instrument.Violin()}
 
 # DEF
 
@@ -47,9 +48,12 @@ def home():
 
 @app.route('/api/v1/categories', methods=['GET'])
 def api_get_all_categories():
-    print(categories_with_models.keys())
     return jsonify(getList(categories_with_models))
 
+
+@app.route('/api/v1/instruments', methods=['GET'])
+def api_get_all_instruments():
+    return jsonify(getList(instruments))
 
 @app.route('/api/v1/generate_image', methods=['POST'])
 def api_post_create_image():
@@ -69,12 +73,20 @@ def api_post_create_image():
 @app.route('/api/v1/generate_song', methods=['POST'])
 def api_post_create_song():
     data = request.json
-    category = data['category']
-    if category is None:
-        resp = jsonify(error="please enter a category")
-        return resp
 
-    filename = generate_song(category, categories_with_models[category])
+    category = data.get('category')
+    if category is None:
+        return jsonify(error="please enter a category")
+    if category not in getList(categories_with_models):
+        return jsonify(error="incorrect category : " + category + " not in " + str(getList(categories_with_models)))
+
+    instru = data.get('instrument')
+    if instru is not None:
+        if instru not in getList(instruments):
+            return jsonify(error="incorrect instrument : " + instru + " not in " + str(getList(instruments)))
+        filename = generate_song(category, categories_with_models[category], instruments[instru])
+    else:
+        filename = generate_song(category, categories_with_models[category])
 
     return send_file(filename_or_fp=filename, mimetype="audio/midi", as_attachment=True)
 
