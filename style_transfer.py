@@ -1,14 +1,19 @@
 # =======================================================================================================================
 # TRANSFERT DE STYLE
 # =======================================================================================================================
-
+import base64
+import json
 import time
+from io import BytesIO
 
 import IPython.display as display
 import PIL.Image
 import matplotlib.pyplot as plt
 import numpy as np
 import tensorflow as tf
+from keras import backend as K
+
+tf.config.experimental_run_functions_eagerly(True)
 
 
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -50,8 +55,13 @@ def conversion_tenseur_vers_image(tenseur):
         assert tenseur.shape[0] == 1
         tenseur = tenseur[0]
 
+    pil_img = PIL.Image.fromarray(tenseur)
+    buff = BytesIO()
+    pil_img.save(buff, format="JPEG")
+    new_image_string = base64.b64encode(buff.getvalue()).decode("utf-8")
+
     # utilisation de la librairie Pillow pour transformer le tableau en image
-    return PIL.Image.fromarray(tenseur)
+    return (new_image_string)
 
 
 def affichage_image(image, titre=None):
@@ -189,7 +199,7 @@ def etape_generation(image, optimiseur, extracteur, cible_contenu, cible_style, 
 
 
 def style_transfer(chemin_image_source, chemin_image_style) -> str:
-    chemin_image_composite = "generation-image-"+str(time.time())
+    chemin_image_composite = "generation-image-"+str(time.time())+".jpg"
 
     image_source = chargement_image(chemin_image_source)
     image_style = chargement_image(chemin_image_style)
@@ -220,8 +230,8 @@ def style_transfer(chemin_image_source, chemin_image_style) -> str:
 
     image = tf.Variable(image_source)
 
-    epochs = 10
-    etapes_generation_epoch = 100
+    epochs = 1
+    etapes_generation_epoch = 2
     # Generarion de l'image
     DEBUT = time.time()
     step = 0
@@ -237,5 +247,7 @@ def style_transfer(chemin_image_source, chemin_image_style) -> str:
 
     FIN = time.time()
 
-    conversion_tenseur_vers_image(image).save(chemin_image_composite)
-    return chemin_image_composite
+    #conversion_tenseur_vers_image(image).save(chemin_image_composite)
+    K.clear_session()
+
+    return conversion_tenseur_vers_image(image)

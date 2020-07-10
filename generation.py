@@ -53,19 +53,24 @@ def preparationSequences(notes, pitchnames, n_vocab):
 
 def creationDuReseau(network_input, n_vocab, model_name):
     model = Sequential()
-    model.add(LSTM(512,input_shape=(network_input.shape[1], network_input.shape[2]),return_sequences=True))
+    model.add(LSTM(
+        512,
+        input_shape=(network_input.shape[1], network_input.shape[2]),
+        recurrent_dropout=0.3,
+        return_sequences=True
+    ))
+    model.add(LSTM(512, return_sequences=True, recurrent_dropout=0.3, ))
+    model.add(LSTM(512))
+    model.add(BatchNorm())
     model.add(Dropout(0.3))
-    model.add(Bidirectional(LSTM(256, return_sequences=True)))
-    model.add(Dropout(0.3))
-    model.add(Bidirectional(LSTM(256)))
     model.add(Dense(256))
     model.add(Activation('relu'))
     model.add(BatchNorm())
     model.add(Dropout(0.3))
     model.add(Dense(n_vocab))
     model.add(Activation('softmax'))
-    model.compile(loss='categorical_crossentropy', optimizer='adam')
-    # Chargement des poids
+    model.compile(loss='categorical_crossentropy', optimizer='rmsprop')
+
     model.load_weights(model_name)
 
     return model
