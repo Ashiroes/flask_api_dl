@@ -1,0 +1,92 @@
+{
+	"info": {
+		"_postman_id": "2e4a84c4-b602-4f3c-8267-856a21a78b20",
+		"name": "IA",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Generate model",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"category\": \"80s\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "127.0.0.1:5000/api/v1/generate_model",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "5000",
+					"path": [
+						"api",
+						"v1",
+						"generate_model"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Generate song",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "content-type",
+						"value": "multipart/form-data",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "image",
+							"type": "file",
+							"src": "/Users/antoineguestin/Downloads/IA et Arts/Generation_tableaux/dataset/sources/lille.jpg"
+						},
+						{
+							"key": "style",
+							"type": "file",
+							"src": "/Users/antoineguestin/Downloads/IA et Arts/Generation_tableaux/dataset/styles/pointillisme.jpg"
+						}
+					]
+				},
+				"url": {
+					"raw": "127.0.0.1:5000/api/v1/generate_song",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "5000",
+					"path": [
+						"api",
+						"v1",
+						"generate_song"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"protocolProfileBehavior": {}
+}
